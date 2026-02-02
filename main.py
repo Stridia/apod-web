@@ -1,5 +1,6 @@
 # Astronomy Picture of the Day
 import streamlit as st
+import time as t
 import requests
 from dotenv import load_dotenv
 import os
@@ -14,7 +15,8 @@ response = requests.get(URL)
 content = response.json()
 
 # Web Development
-st.subheader("Astronomy Picture of The Day")
 st.title(content['title'])
+st.subheader("Astronomy Picture of The Day")
+st.text(t.strftime("%A, %B %d %Y"))
 st.image(content['url'])
 st.write(content['explanation'])

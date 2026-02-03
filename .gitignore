@@ -1,6 +1,6 @@
 .venv
 .idea
 .env
-*.txt
 .streamlit
-queries.py
+__pycache__
+*.txt

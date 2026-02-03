@@ -23,6 +23,8 @@ else:
         data = b.fetch_db(conn, yesterday)
         content = data.iloc[0].to_dict()
 
+# Change date format (Ex: 2026-02-01 -> Sunday, 01 February 2026)
+content['date'] = date.strptime(content['date'], '%Y-%m-%d').strftime('%A, %d %B %Y')
 
 # Web Development
 st.title(content['title'])

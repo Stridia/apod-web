@@ -15,8 +15,8 @@ else:
         # Request today's APOD data from NASA's API
         content = b.request_api(today)
 
-        # Update the database with today's APOD
-        b.update_db(conn, content)
+        # Insert today's APOD data to the database
+        b.insert_db(conn, content)
     except KeyError:
         # Fetch yesterday's data if today's data is not available
         yesterday = (date.today() - timedelta(days=1)).isoformat()

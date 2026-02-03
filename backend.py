@@ -14,13 +14,13 @@ def request_api(day):
     return response.json()
 
 def fetch_db(connection, day):
-    """Fetch APOD record on a certain date from the local database using query"""
+    """Fetch APOD data on a certain date from the local database using query"""
     query = "SELECT * FROM apod_table WHERE date = :date;"
     data = connection.query(query, params={'date': day}, ttl=0)
     return data
 
-def update_db(connection, content):
-    """Update database by adding new APOD data from NASA's API"""
+def insert_db(connection, content):
+    """Insert new APOD data to the local database"""
     with connection.session as s:
         s.execute(text("CREATE TABLE IF NOT EXISTS apod_table (date TEXT, title TEXT, url TEXT, explanation TEXT);"))
         s.execute(text("INSERT INTO apod_table VALUES (:date, :title, :url, :explanation);"),
@@ -34,7 +34,7 @@ def printall_db(connection):
     print(data)
 
 def delete_db(connection, day):
-    """Delete APOD record from the local database"""
+    """Delete APOD data from the local database"""
     with connection.session as s:
         s.execute(text("DELETE FROM apod_table WHERE date = :day"), params={'day': day})
         s.commit()

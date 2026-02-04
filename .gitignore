@@ -1,6 +1,7 @@
 .venv
 .idea
 .env
-.streamlit
 __pycache__
+secrets.toml
 *.txt
+*.db

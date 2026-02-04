@@ -2,6 +2,8 @@ import streamlit as st
 import backend as b
 from datetime import date, timedelta
 
+st.set_page_config(page_title="Astronomy Picture of The Day", layout="wide")
+
 # Connect with SQL Database
 conn = st.connection('apod_db', type='sql')
 today = date.today()
@@ -29,8 +31,13 @@ else:
 # Change date format (Ex: 2026-02-01 -> Sunday, 01 February 2026)
 content['date'] = date.strptime(content['date'], '%Y-%m-%d').strftime('%A, %d %B %Y')
 
-# Show APOD (Web Development)
-st.title(content['title'])
-st.write(content['date'])
-st.image(content['url'])
-st.write(content['explanation'])
+# Web Development
+col1, col2 = st.columns([0.4, 0.6], width=2000)
+
+with col1:
+    st.image(content['url'])
+
+with col2:
+    st.title(content['title'])
+    st.write(content['date'])
+    st.write(content['explanation'])

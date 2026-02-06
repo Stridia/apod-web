@@ -31,4 +31,5 @@ if content:
         st.write(content['date'])
         st.write(content['explanation'])
 else:
-    st.text("Sorry, NASA's servers may currently be down today due to uprecedented alien invasions. Check again later!")
+    st.text("Sorry, NASA's servers may currently be down today due to "
+            "unprecedented alien invasions. Check again later!")

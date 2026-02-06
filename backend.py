@@ -18,6 +18,9 @@ def get_apod_data(day):
         try:
             # Request APOD data from NASA's API (If not present in database) and insert it to the database
             content = request_api(day)
+
+            # Return None if there's an error when fetching data from the API
+            if not content: return None
             insert_db(content)
         except KeyError:
             # Fetch yesterday's data if today's data is not available
@@ -29,7 +32,8 @@ def request_api(day):
     """Request APOD data on a certain date from NASA's API"""
     url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={day}"
     response = requests.get(url)
-    return response.json()
+    if response.status_code == 200: return response.json()
+    else: return None
 
 def fetch_db(day):
     """Fetch APOD data on a certain date from the local database using query"""

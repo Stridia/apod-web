@@ -2,10 +2,28 @@ from dotenv import load_dotenv
 import requests, os
 import streamlit as st
 from sqlalchemy import text
+from datetime import date, timedelta
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
 conn = st.connection('apod_db', type='sql')
+
+def get_apod_data(day):
+    """Get and return the APOD data (either from API or database) on a certain date"""
+    # Fetch APOD data straight from the database
+    data = fetch_db(day)
+    if not data.empty:
+        content = data.iloc[0].to_dict()
+    else:
+        try:
+            # Request APOD data from NASA's API (If not present in database) and insert it to the database
+            content = request_api(day)
+            insert_db(content)
+        except KeyError:
+            # Fetch yesterday's data if today's data is not available
+            yesterday = (date.today() - timedelta(days=1)).isoformat()
+            content = get_apod_data(yesterday)
+    return content
 
 def request_api(day):
     """Request APOD data on a certain date from NASA's API"""

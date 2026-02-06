@@ -5,7 +5,7 @@ from sqlalchemy import text
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
-
+conn = st.connection('apod_db', type='sql')
 
 def request_api(day):
     """Request APOD data on a certain date from NASA's API"""
@@ -13,33 +13,32 @@ def request_api(day):
     response = requests.get(url)
     return response.json()
 
-def fetch_db(connection, day):
+def fetch_db(day):
     """Fetch APOD data on a certain date from the local database using query"""
     query = "SELECT * FROM apod_table WHERE date = :date;"
-    data = connection.query(query, params={'date': day}, ttl=0)
+    data = conn.query(query, params={'date': day}, ttl=0)
     return data
 
-def insert_db(connection, content):
+def insert_db(content):
     """Insert new APOD data to the local database"""
-    with connection.session as s:
+    with conn.session as s:
         s.execute(text("CREATE TABLE IF NOT EXISTS apod_table (date TEXT, title TEXT, url TEXT, explanation TEXT);"))
         s.execute(text("INSERT INTO apod_table VALUES (:date, :title, :url, :explanation);"),
                   params={'date': content['date'], 'title': content['title'],
                           'url': content['url'], 'explanation': content['explanation']})
         s.commit()
 
-def printall_db(connection):
+def printall_db():
     """Print all recorded APOD data in the local database"""
-    data = connection.query("SELECT * FROM apod_table ORDER BY date DESC", ttl=0)
+    data = conn.query("SELECT * FROM apod_table ORDER BY date DESC", ttl=0)
     print(data)
 
-def delete_db(connection, day):
+def delete_db(day):
     """Delete APOD data from the local database"""
-    with connection.session as s:
+    with conn.session as s:
         s.execute(text("DELETE FROM apod_table WHERE date = :day"), params={'day': day})
         s.commit()
 
 
 if __name__ == '__main__':
-    conn = st.connection('apod_db', type='sql')
-    printall_db(conn)
+    printall_db()

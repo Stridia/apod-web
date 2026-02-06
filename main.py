@@ -26,7 +26,11 @@ else:
         # Fetch yesterday's data if today's data is not available
         yesterday = (today - timedelta(days=1)).isoformat()
         data = b.fetch_db(conn, yesterday)
-        content = data.iloc[0].to_dict()
+        if not data.empty:
+            content = data.iloc[0].to_dict()
+        else:
+            content = b.request_api(yesterday)
+            b.insert_db(conn, content)
 
 # Change date format (Ex: 2026-02-01 -> Sunday, 01 February 2026)
 content['date'] = date.strptime(content['date'], '%Y-%m-%d').strftime('%A, %d %B %Y')

@@ -20,12 +20,15 @@ content = get_apod_data(day)
 content['date'] = date.strptime(content['date'], '%Y-%m-%d').strftime('%A, %d %B %Y')
 
 # Web Development
-col1, col2 = st.columns([0.4, 0.6], width=2000)
+if content:
+    col1, col2 = st.columns([0.4, 0.6], width=2000)
 
-with col1:
-    st.image(content['url'])
+    with col1:
+        st.image(content['url'])
 
-with col2:
-    st.title(content['title'])
-    st.write(content['date'])
-    st.write(content['explanation'])
+    with col2:
+        st.title(content['title'])
+        st.write(content['date'])
+        st.write(content['explanation'])
+else:
+    st.text("Sorry, NASA's servers may currently be down today due to uprecedented alien invasions. Check again later!")

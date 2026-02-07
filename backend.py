@@ -7,9 +7,9 @@ from datetime import datetime, timedelta
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
-conn = st.connection('apod_db', type='sql')
 
-# Create a new database if it doesn't exist
+# Database Connection
+conn = st.connection('apod_db', type='sql')
 with conn.session as s:
     s.execute(text("CREATE TABLE IF NOT EXISTS apod_table (date TEXT, title TEXT, url TEXT, "
                    "explanation TEXT, media_type TEXT);"))
@@ -21,11 +21,14 @@ def daily_api_request():
     today = datetime.today()
     data = fetch_db(today.date())
 
-    if today.hour >= 13 and data.empty:
+    if today.hour >= 12 and data.empty:
         content = request_api(today.date())
         insert_db(content)
+
+    if today.hour >= 12:
         return today.date()
-    return today.date() - timedelta(days=1)
+    else:
+        return today.date() - timedelta(days=1)
 
 def get_apod_data(day):
     """Get and return the APOD data (either from API or database) on a certain date"""

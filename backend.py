@@ -8,6 +8,13 @@ load_dotenv()
 API_KEY = os.getenv("API_KEY")
 conn = st.connection('apod_db', type='sql')
 
+# Create a new database if it doesn't exist
+with conn.session as s:
+    s.execute(text("CREATE TABLE IF NOT EXISTS apod_table (date TEXT, title TEXT, url TEXT, "
+                   "explanation TEXT, media_type TEXT);"))
+    s.commit()
+
+
 def daily_api_request():
     """Request APOD data from the API daily and return today's date if data is available"""
     today = datetime.today()
@@ -50,11 +57,17 @@ def fetch_db(day):
 
 def insert_db(content):
     """Insert new APOD data to the local database"""
+    # Fetch image data if available
+    try:
+        image_url = content['url']
+    except KeyError:
+        image_url = None
+
+    # Insert APOD data into database
     with conn.session as s:
-        s.execute(text("CREATE TABLE IF NOT EXISTS apod_table (date TEXT, title TEXT, url TEXT, explanation TEXT);"))
-        s.execute(text("INSERT INTO apod_table VALUES (:date, :title, :url, :explanation);"),
-                  params={'date': content['date'], 'title': content['title'],
-                          'url': content['url'], 'explanation': content['explanation']})
+        s.execute(text("INSERT INTO apod_table VALUES (:date, :title, :url, :explanation, :media_type);"),
+                  params={'date': content['date'], 'title': content['title'], 'url': image_url,
+                          'explanation': content['explanation'], 'media_type': content['media_type']})
         s.commit()
 
 def printall_db():

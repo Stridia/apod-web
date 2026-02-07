@@ -24,6 +24,8 @@ def daily_api_request():
     if today.hour >= 12 and data.empty:
         content = request_api(today.date())
         insert_db(content)
+        # Cleanup data older than 30 days
+        cleanup_old_db()
 
     if today.hour >= 12:
         return today.date()
@@ -82,14 +84,15 @@ def insert_db(content):
         s.commit()
 
 def printall_db():
-    """Print all recorded APOD data in the local database"""
+    """Print all recorded APOD data from the local database"""
     data = conn.query("SELECT * FROM apod_table ORDER BY date DESC", ttl=0)
     print(data)
 
-def delete_db(day):
-    """Delete APOD data from the local database"""
+def cleanup_old_db(days_to_keep=30):
+    """Delete records older than the specified number of days"""
+    oldest_date = datetime.today().date() - timedelta(days=days_to_keep)
     with conn.session as s:
-        s.execute(text("DELETE FROM apod_table WHERE date = :day"), params={'day': day})
+        s.execute(text("DELETE FROM apod_table WHERE date < :date"), params={'date': oldest_date})
         s.commit()
 
 

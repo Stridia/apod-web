@@ -32,7 +32,7 @@ def request_api(day):
     """Request APOD data on a certain date from NASA's API"""
     url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={day}"
     response = requests.get(url)
-    if response.status_code == 200: return response.json()
+    if response.status_code in (200, 404): return response.json()
     else: return None
 
 def fetch_db(day):

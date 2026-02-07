@@ -1,3 +1,4 @@
+import sys
 import streamlit as st
 from datetime import date, timedelta
 from backend import get_apod_data
@@ -15,21 +16,22 @@ day = st.date_input("", today, label_visibility="collapsed", format="DD.MM.YYYY"
 
 # Get the APOD data
 content = get_apod_data(day)
+if not content:
+    st.text("Sorry, NASA's servers may currently be down today due to "
+            "unprecedented alien invasions. Check again later!")
+    sys.exit(0)
 
 # Change date format (Ex: 2026-02-01 -> Sunday, 01 February 2026)
 content['date'] = date.strptime(content['date'], '%Y-%m-%d').strftime('%A, %d %B %Y')
 
 # Web Development
-if content:
-    col1, col2 = st.columns([0.4, 0.6], width=2000)
+col1, col2 = st.columns([0.4, 0.6], width=2000)
 
-    with col1:
-        st.image(content['url'])
+with col1:
+    st.image(content['url'])
 
-    with col2:
-        st.title(content['title'])
-        st.write(content['date'])
-        st.write(content['explanation'])
-else:
-    st.text("Sorry, NASA's servers may currently be down today due to "
-            "unprecedented alien invasions. Check again later!")
+with col2:
+    st.title(content['title'])
+    st.write(content['date'])
+    st.write(content['explanation'])
+

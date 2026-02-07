@@ -1,13 +1,14 @@
-import sys
 import streamlit as st
 from datetime import date, timedelta
-from backend import get_apod_data
+from backend import get_apod_data, daily_api_request
 
 st.set_page_config(page_title="Astronomy Picture of The Day", layout="wide")
 
 # Connect with SQL Database
 conn = st.connection('apod_db', type='sql')
-today = date.today()
+
+# Gets the APOD data from API for today's date
+today = daily_api_request()
 
 # Date Input
 st.subheader("Astronomy Picture of The Day")
@@ -16,10 +17,6 @@ day = st.date_input("", today, label_visibility="collapsed", format="DD.MM.YYYY"
 
 # Get the APOD data
 content = get_apod_data(day)
-if not content:
-    st.text("Sorry, NASA's servers may currently be down today due to "
-            "unprecedented alien invasions. Check again later!")
-    sys.exit(0)
 
 # Change date format (Ex: 2026-02-01 -> Sunday, 01 February 2026)
 content['date'] = date.strptime(content['date'], '%Y-%m-%d').strftime('%A, %d %B %Y')

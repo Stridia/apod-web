@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import requests, os, sys
+import time as t
 import streamlit as st
 from sqlalchemy import text
 from datetime import datetime, timedelta
@@ -40,8 +41,15 @@ def get_apod_data(day):
 
 def request_api(day):
     """Request APOD data on a certain date from NASA's API"""
-    url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={day}"
-    response = requests.get(url)
+    container = st.empty()
+    with container.container():
+        with st.status(label="Fetching today's wonders from NASA...", expanded=False) as status:
+            url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={day}"
+            response = requests.get(url)
+            status.update(label="Data synced with database!", state="complete")
+
+    t.sleep(1)
+    container.empty()
     if response.status_code == 200: return response.json()
 
     # Display error message if there's trouble fetching data from the API

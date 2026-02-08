@@ -11,7 +11,7 @@ conn = st.connection('apod_db', type='sql')
 today = daily_api_request()
 
 # Date Input
-st.subheader("Astronomy Picture of The Day")
+st.subheader(":sparkles: Astronomy Picture of The Day")
 day = st.date_input("", today, label_visibility="collapsed", format="DD.MM.YYYY",
                     max_value=today, min_value=today - timedelta(days=30))
 

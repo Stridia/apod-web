@@ -55,7 +55,14 @@ def request_api(day):
 
     t.sleep(1)
     container.empty()
-    if response.status_code == 200: return response.json()
+
+    if response.status_code == 200:
+        content = response.json()
+
+        # Select an emoji for each APOD data
+        content['title'] = title_emoji(content) + ' ' + content['title']
+
+        return content
 
     # Display error message if there's trouble fetching data from the API
     st.text("Sorry, NASA's servers may currently be down today due to "
@@ -94,6 +101,17 @@ def cleanup_old_db(days_to_keep=30):
     with conn.session as s:
         s.execute(text("DELETE FROM apod_table WHERE date < :date"), params={'date': oldest_date})
         s.commit()
+
+def title_emoji(content):
+    """Select an emoji for the given APOD based on its explanation"""
+    explanation = content['explanation'].lower()
+    words = ["galaxy", "star", "moon", "sun", "spacecraft", "satellite"]
+    emojis  = [":milky_way:", ":dizzy:", ":crescent_moon:", ":sunny:", ":rocket:", ":artificial_satellite:"]
+
+    for i, word in enumerate(words):
+        if word in explanation:
+            return emojis[i]
+    return ":stars:"
 
 
 if __name__ == '__main__':

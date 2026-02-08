@@ -45,7 +45,8 @@ def get_apod_data(day):
     return content
 
 def request_api(day):
-    """Request APOD data on a certain date from NASA's API"""
+    """Request APOD data on a certain date from NASA's API
+       Additionally, add supporting emojis in the beginning of APOD titles"""
     container = st.empty()
     with container.container():
         with st.status(label="Fetching today's wonders from NASA...", expanded=False) as status:
@@ -105,8 +106,8 @@ def cleanup_old_db(days_to_keep=30):
 def title_emoji(content):
     """Select an emoji for the given APOD based on its explanation"""
     explanation = content['explanation'].lower()
-    words = ["galaxy", "star", "moon", "sun", "spacecraft", "satellite"]
-    emojis  = [":milky_way:", ":dizzy:", ":crescent_moon:", ":sunny:", ":rocket:", ":artificial_satellite:"]
+    words = ["galaxy", "spacecraft", "satellite", "star", "moon", "sun"]
+    emojis  = [":milky_way:", ":rocket:", ":artificial_satellite:", ":dizzy:", ":crescent_moon:", ":sunny:"]
 
     for i, word in enumerate(words):
         if word in explanation:
@@ -115,4 +116,7 @@ def title_emoji(content):
 
 
 if __name__ == '__main__':
+    with conn.session as s:
+        s.execute(text("DELETE FROM apod_table WHERE date = :date"), params={'date': "2026-01-31"})
+        s.commit()
     printall_db()

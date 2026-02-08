@@ -1,5 +1,5 @@
 import streamlit as st
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 from backend import get_apod_data, daily_api_request
 
 st.set_page_config(page_title="Astronomy Picture of The Day", layout="wide")
@@ -16,7 +16,7 @@ day = st.date_input("", today, label_visibility="collapsed", format="DD.MM.YYYY"
 content = get_apod_data(day)
 
 # Change date format (Ex: 2026-02-01 -> Sunday, 01 February 2026)
-content['date'] = date.strptime(content['date'], '%Y-%m-%d').strftime('%A, %d %B %Y')
+content['date'] = datetime.strptime(content['date'], '%Y-%m-%d').strftime('%A, %d %B %Y')
 
 # Web Development
 if content['media_type'] == 'image':

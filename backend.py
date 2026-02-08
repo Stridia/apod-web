@@ -1,20 +1,23 @@
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 import requests, sys
 import time as t
 import streamlit as st
-from sqlalchemy import text
-from datetime import datetime, timedelta, timezone
+import pandas as pd
+import sqlitecloud
+
+@st.cache_resource
+def get_cloud_connection():
+    """Connect to the SQLite Cloud database"""
+    db_url = st.secrets["sqlitecloud"]["url"]
+    connection = sqlitecloud.connect(db_url)
+    connection.execute("CREATE TABLE IF NOT EXISTS apod_table (date TEXT PRIMARY KEY, title TEXT, url TEXT, "
+                       "explanation TEXT, media_type TEXT);")
+    return connection
 
 load_dotenv()
 API_KEY = st.secrets["API_KEY"]
-
-# Database Connection
-db_name = st.secrets["DB_NAME"]
-conn = st.connection(db_name, type='sql')
-with conn.session as s:
-    s.execute(text("CREATE TABLE IF NOT EXISTS apod_table (date TEXT, title TEXT, url TEXT, "
-                   "explanation TEXT, media_type TEXT);"))
-    s.commit()
+conn = get_cloud_connection()
 
 
 def daily_api_request():
@@ -74,9 +77,11 @@ def request_api(day):
 
 def fetch_db(day):
     """Fetch APOD data on a certain date from the local database using query"""
-    query = "SELECT * FROM apod_table WHERE date = :date;"
-    data = conn.query(query, params={'date': day}, ttl=0)
-    return data
+    query = "SELECT * FROM apod_table WHERE date = ?;"
+    cursor = conn.execute(query, parameters=(str(day),))
+    rows = cursor.fetchall()
+    cols = [column[0] for column in cursor.description]
+    return pd.DataFrame(rows, columns=cols)
 
 def insert_db(content):
     """Insert new APOD data to the local database"""
@@ -87,23 +92,20 @@ def insert_db(content):
         image_url = None
 
     # Insert APOD data into database
-    with conn.session as s:
-        s.execute(text("INSERT INTO apod_table VALUES (:date, :title, :url, :explanation, :media_type);"),
-                  params={'date': content['date'], 'title': content['title'], 'url': image_url,
-                          'explanation': content['explanation'], 'media_type': content['media_type']})
-        s.commit()
+    query = "INSERT INTO apod_table (date, title, url, explanation, media_type) VALUES (?, ?, ?, ?, ?)"
+    conn.execute(query, parameters=(content['date'], content['title'], image_url,
+                         content['explanation'], content['media_type']))
 
 def printall_db():
     """Print all recorded APOD data from the local database"""
-    data = conn.query("SELECT * FROM apod_table ORDER BY date DESC", ttl=0)
+    query = "SELECT * FROM apod_table ORDER BY date DESC"
+    data = conn.execute(query)
     print(data)
 
 def cleanup_old_db(days_to_keep=30):
     """Delete records older than the specified number of days"""
     oldest_date = datetime.today().date() - timedelta(days=days_to_keep)
-    with conn.session as s:
-        s.execute(text("DELETE FROM apod_table WHERE date < :date"), params={'date': oldest_date})
-        s.commit()
+    conn.execute("DELETE FROM apod_table WHERE date < ?", parameters=(str(oldest_date),))
 
 def title_emoji(content):
     """Select an emoji for the given APOD based on its explanation"""

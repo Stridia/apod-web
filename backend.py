@@ -26,7 +26,7 @@ def daily_api_request():
     now_utc = datetime.now(timezone.utc)
 
     today = now_utc.date()
-    if now_utc.hour < 5:
+    if now_utc.hour < 6:
         today = today - timedelta(days=1)
 
     data = fetch_db(today)

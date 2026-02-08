@@ -3,7 +3,7 @@ import requests, os, sys
 import time as t
 import streamlit as st
 from sqlalchemy import text
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
@@ -18,19 +18,20 @@ with conn.session as s:
 
 def daily_api_request():
     """Request APOD data from the API daily and return today's date if data is available"""
-    today = datetime.today()
-    data = fetch_db(today.date())
+    # Uses UTC timezone to fetch data daily
+    now_utc = datetime.now(timezone.utc)
 
-    if today.hour >= 12 and data.empty:
-        content = request_api(today.date())
+    today = now_utc.date()
+    if now_utc.hour < 5:
+        today = today - timedelta(days=1)
+
+    data = fetch_db(today)
+    if data.empty:
+        content = request_api(today)
         insert_db(content)
-        # Cleanup data older than 30 days
-        cleanup_old_db()
+        cleanup_old_db(30)
 
-    if today.hour >= 12:
-        return today.date()
-    else:
-        return today.date() - timedelta(days=1)
+    return today
 
 def get_apod_data(day):
     """Get and return the APOD data (either from API or database) on a certain date"""
@@ -116,7 +117,5 @@ def title_emoji(content):
 
 
 if __name__ == '__main__':
-    with conn.session as s:
-        s.execute(text("DELETE FROM apod_table WHERE date = :date"), params={'date': "2026-01-31"})
-        s.commit()
+    daily_api_request()
     printall_db()

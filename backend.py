@@ -1,15 +1,16 @@
 from dotenv import load_dotenv
-import requests, os, sys
+import requests, sys
 import time as t
 import streamlit as st
 from sqlalchemy import text
 from datetime import datetime, timedelta, timezone
 
 load_dotenv()
-API_KEY = os.getenv("API_KEY")
+API_KEY = st.secrets["API_KEY"]
 
 # Database Connection
-conn = st.connection('apod_db', type='sql')
+db_name = st.secrets["DB_NAME"]
+conn = st.connection(db_name, type='sql')
 with conn.session as s:
     s.execute(text("CREATE TABLE IF NOT EXISTS apod_table (date TEXT, title TEXT, url TEXT, "
                    "explanation TEXT, media_type TEXT);"))

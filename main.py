@@ -4,9 +4,6 @@ from backend import get_apod_data, daily_api_request
 
 st.set_page_config(page_title="Astronomy Picture of The Day", layout="wide")
 
-# Connect with SQL Database
-conn = st.connection('apod_db', type='sql')
-
 # Gets the APOD data from API for today's date
 today = daily_api_request()
 

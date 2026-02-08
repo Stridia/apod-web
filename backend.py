@@ -110,8 +110,8 @@ def cleanup_old_db(days_to_keep=30):
 def title_emoji(content):
     """Select an emoji for the given APOD based on its explanation"""
     explanation = content['explanation'].lower()
-    words = ["galaxy", "spacecraft", "satellite", "star", "moon", "sun"]
-    emojis  = [":milky_way:", ":rocket:", ":artificial_satellite:", ":dizzy:", ":crescent_moon:", ":sunny:"]
+    words = ["galaxy", "sun", "spacecraft", "satellite", "star", "moon"]
+    emojis  = [":milky_way:", ":sunny:", ":rocket:", ":artificial_satellite:", ":dizzy:", ":crescent_moon:"]
 
     for i, word in enumerate(words):
         if word in explanation:

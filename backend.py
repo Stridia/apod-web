@@ -5,6 +5,8 @@ import time as t
 import streamlit as st
 import pandas as pd
 import sqlitecloud
+from sqlitecloud import SQLiteCloudError
+
 
 @st.cache_resource
 def get_cloud_connection():
@@ -14,6 +16,15 @@ def get_cloud_connection():
     connection.execute("CREATE TABLE IF NOT EXISTS apod_table (date TEXT PRIMARY KEY, title TEXT, url TEXT, "
                        "explanation TEXT, media_type TEXT);")
     return connection
+
+def check_cloud_connection():
+    """Check if the SQLite cloud database connection is available"""
+    try:
+        conn.execute("SELECT * FROM apod_table")
+        return True
+    except SQLiteCloudError:
+        return False
+
 
 load_dotenv()
 API_KEY = st.secrets["API_KEY"]
@@ -96,7 +107,7 @@ def insert_db(content):
     conn.execute(query, parameters=(content['date'], content['title'], image_url,
                          content['explanation'], content['media_type']))
 
-def printall_db():
+def printall_db():  
     """Print all recorded APOD data from the local database"""
     query = "SELECT * FROM apod_table ORDER BY date DESC"
     data = conn.execute(query)

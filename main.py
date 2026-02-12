@@ -10,7 +10,7 @@ min_day = today - timedelta(days=30)
 
 # Check for SQLite cloud database connection
 is_connected = check_cloud_connection()
-if is_connected: min_day = today
+if not is_connected: min_day = today
 
 # Date Input
 st.subheader(":sparkles: Astronomy Picture of The Day")

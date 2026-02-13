@@ -5,25 +5,20 @@ import time as t
 import streamlit as st
 import pandas as pd
 import sqlitecloud
-from sqlitecloud import SQLiteCloudError
+from sqlitecloud.exceptions import SQLiteCloudException
 
 
 @st.cache_resource
 def get_cloud_connection():
-    """Connect to the SQLite Cloud database"""
-    db_url = st.secrets["sqlitecloud"]["url"]
-    connection = sqlitecloud.connect(db_url)
-    connection.execute("CREATE TABLE IF NOT EXISTS apod_table (date TEXT PRIMARY KEY, title TEXT, url TEXT, "
-                       "explanation TEXT, media_type TEXT);")
-    return connection
-
-def check_cloud_connection():
-    """Check if the SQLite cloud database connection is available"""
+    """Connect to the SQLite Cloud database. Return None if connection fails"""
     try:
-        conn.execute("SELECT * FROM apod_table")
-        return True
-    except SQLiteCloudError:
-        return False
+        db_url = st.secrets["sqlitecloud"]["url"]
+        connection = sqlitecloud.connect(db_url)
+        connection.execute("CREATE TABLE IF NOT EXISTS apod_table (date TEXT PRIMARY KEY, title TEXT, url TEXT, "
+                           "explanation TEXT, media_type TEXT);")
+        return connection
+    except SQLiteCloudException:
+        return None
 
 
 load_dotenv()
@@ -40,16 +35,24 @@ def daily_api_request():
     if now_utc.hour < 6:
         today = today - timedelta(days=1)
 
-    data = fetch_db(today)
-    if data.empty:
-        content = request_api(today)
-        insert_db(content)
-        cleanup_old_db(30)
+    if conn:
+        data = fetch_db(today)
+        if data.empty:
+            content = request_api(today)
+            insert_db(content)
+            cleanup_old_db(30)
 
     return today
 
 def get_apod_data(day):
     """Get and return the APOD data (either from API or database) on a certain date"""
+    # Request APOD data from API if database is down
+    if not conn:
+        st.write("[Unable to fetch data from database due to connection issues. Please contact the developer "
+                 "and check again later!]")
+        content = request_api(day)
+        return content
+
     # Fetch APOD data straight from the database
     data = fetch_db(day)
     if not data.empty:
@@ -68,7 +71,7 @@ def request_api(day):
         with st.status(label="Fetching today's wonders from NASA...", expanded=False) as status:
             url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={day}"
             response = requests.get(url)
-            status.update(label="Data synced with database!", state="complete")
+            status.update(label="Data sync complete!", state="complete")
 
     t.sleep(1)
     container.empty()

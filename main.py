@@ -1,29 +1,19 @@
 import streamlit as st
 from datetime import datetime, timedelta
-from backend import get_apod_data, daily_api_request, check_cloud_connection, request_api
+from backend import get_apod_data, daily_api_request
 
 st.set_page_config(page_title="Astronomy Picture of The Day", layout="wide")
 
 # Get the APOD data from API for today's date
 today = daily_api_request()
-min_day = today - timedelta(days=30)
-
-# Check for SQLite cloud database connection
-is_connected = check_cloud_connection()
-if not is_connected: min_day = today
 
 # Date Input
 st.subheader(":sparkles: Astronomy Picture of The Day")
 day = st.date_input("", today, label_visibility="collapsed", format="DD.MM.YYYY",
-                    max_value=today, min_value=min_day)
+                    max_value=today, min_value=today - timedelta(days=30))
 
 # Get the APOD data
-if is_connected:
-    content = get_apod_data(day)
-else:
-    content = request_api(day)
-    st.write("[Unable to fetch data from database due to connection issues. Please contact the developer "
-             "and check again later!]")
+content = get_apod_data(day)
 
 # Change date format (Ex: 2026-02-01 -> Sunday, 01 February 2026)
 content['date'] = datetime.strptime(content['date'], '%Y-%m-%d').strftime('%A, %d %B %Y')

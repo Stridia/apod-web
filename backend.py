@@ -37,14 +37,16 @@ def daily_api_request():
     if now_utc.hour < 6:
         today = today - timedelta(days=1)
 
+    total_days = 7
     if conn:
         data = fetch_db(today)
+        total_days = 30
         if data.empty:
             content = request_api(today)
             insert_db(content)
-            cleanup_old_db(30)
+            cleanup_old_db(total_days)
 
-    return today
+    return today, total_days
 
 def get_apod_data(day):
     """Get and return the APOD data (either from API or database) on a certain date"""

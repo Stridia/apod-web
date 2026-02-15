@@ -5,12 +5,12 @@ from backend import get_apod_data, daily_api_request
 st.set_page_config(page_title="Astronomy Picture of The Day", layout="wide")
 
 # Get the APOD data from API for today's date
-today = daily_api_request()
+today, total_days = daily_api_request()
 
 # Date Input
 st.subheader(":sparkles: Astronomy Picture of The Day")
 day = st.date_input("", today, label_visibility="collapsed", format="DD.MM.YYYY",
-                    max_value=today, min_value=today - timedelta(days=30))
+                    max_value=today, min_value=today - timedelta(days=total_days))
 
 # Get the APOD data
 content = get_apod_data(day)

@@ -67,6 +67,7 @@ as an aspiring software developer.
    * Generate your own NASA API key by signing up on NASA's website
    * Create a new project in SQLite Cloud. In that project, create a new `apod.db` database 
    * Create `.streamlit/secrets.toml` in your project and configure the file as shown in the `secrets.toml.example` file:
+   
    ```toml
    API_KEY="<your-nasa-api-key>"
    

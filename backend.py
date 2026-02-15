@@ -5,7 +5,7 @@ import time as t
 import streamlit as st
 import pandas as pd
 import sqlitecloud
-from sqlitecloud.exceptions import SQLiteCloudException
+from sqlitecloud.exceptions import SQLiteCloudException, SQLiteCloudError
 
 
 @st.cache_resource
@@ -18,6 +18,8 @@ def get_cloud_connection():
                            "explanation TEXT, media_type TEXT);")
         return connection
     except SQLiteCloudException:
+        return None
+    except SQLiteCloudError:
         return None
 
 

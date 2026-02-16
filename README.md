@@ -9,7 +9,7 @@ showing how to build a web application using Streamlit and work with APIs. Throu
 I further developed the project by adding unique features that improved user experience to hone my web development skills 
 as an aspiring software developer.
 
-## 📡 Prominent Features 
+## Prominent Features 
 ### Database Management
 
    The application is integrated with **SQLite Cloud** database to ensure that collected data is preserved and accessible
@@ -33,12 +33,12 @@ as an aspiring software developer.
    routine in the database that purges records older than those 30 days to maintain storage availability and database performance.
    
 
-## 🛠️ Tech Stack
+## Tech Stack
 * Frontend: Streamlit (Python-based web framework)
-* Database: SQLite Cloud (Remote persistent storage).
-* API: NASA Open APIs (APOD).
+* Database: SQLite Cloud
+* API: NASA Open APIs (APOD)
 
-## 🚀 BIY (Build It Yourself!)
+## BIY (Build It Yourself!)
 1. **Prerequisites**
 
    * IDE (VS Code, PyCharm, etc.)
@@ -82,13 +82,13 @@ as an aspiring software developer.
    streamlit run main.py
    ```
 
-🤗🎉 **Happy Coding!**
+**Happy Coding!** 🎉
 
-## ☕ Contributing
+## Contributing
 
 Personally, this is a very simple passion project and I don't think I will be further updating it other than maybe doing
 a few tweaks / bug fixes here and there. However, if you have an idea for a really cool feature on this project, **feel free
 to fork this project and open a PR or develop it on your own projects!** Who knows, perhaps I'd be interested in making this
 a full-fledged interactive web application!
 
-🤗 Either way, thank you for stopping by and checking out my project!
+Either way, thank you for stopping by and checking out my project! 🤗
